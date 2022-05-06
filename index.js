@@ -2,23 +2,18 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 const app = express();
 
 
-// userName: dressUser
-// password: voTjL2LJdSe4kSWr
+
 //Middleware
 app.use(cors());
 app.use(express.json());
 
-// DB_USER=dressUser
-// DB_PASS=voTjL2LJdSe4kSWr
 
-// DB_USER=geniusUser
-// DB_PASS=iFiqL19LoUguOKS7
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8w4ie.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
@@ -29,14 +24,35 @@ async function run(){
     try{
            await client.connect();
            const serviceCollection = client.db('dressUp').collection('inventoryItems');
+
           app.get('/service', async(req, res) =>{
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
             res.send(services);
           });
+
+          app.get('/service/:id', async(req, res)=>{
+              const id = req.params.id;
+              const query = {_id: ObjectId(id)};
+              const service = await serviceCollection.findOne(query);
+              res.send(service);
+          })
+
+          app.post('/products', async(req, res) =>{
+               const product = req.body;
+               console.log('add new user',product);
+                // res.send({result: ' user data receved'});
+              
+
+               if(!product.name || !product.price ){
+                   return res.send({success: false, error: "Please Provide all information"})
+               }
+               const result = await serviceCollection.insertOne(product);
+          });
     }
-    finally{
+   finally{
+       
 
     }
 
