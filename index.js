@@ -39,32 +39,66 @@ async function run() {
             res.send(service);
         })
 
+
+        // data post
+
         app.post('/service', async (req, res) => {
             const product = req.body;
-            console.log('add new user', product);
-            // res.send({result: ' user data receved'});
-
-
-            if (!product.name || !product.price || !product.quantity || !product.suppler || !product.image ||!product.description) {
+            // console.log('add new user', product);
+            if (!product.name || !product.price || !product.quantity || !product.suppler || !product.image || !product.description) {
                 return res.send({ success: false, error: "Please Provide all information" })
             }
             const result = await serviceCollection.insertOne(product);
             res.send({ success: true, message: `Successfully inserted ${product.name}!` });
         });
 
+        // data get
+
         app.get('/service', async (req, res) => {
-            
             const limit = Number(req.query.limit);
             // console.log(limit);
             const cursor = serviceCollection.find();
             const products = await cursor.limit(limit).toArray();
-           
             if (!products?.length) {
                 return res.send({ success: false, error: "No product found" })
             }
-            res.send({ success: true, data: products});
-            
+            res.send({ success: true, data: products });
+
+        });
+
+          //update data
+          app.put('/service/:id', async(req, res) =>{
+            const id = req.params.id;
+            console.log(id);
+            const product = req.body;
+            const filter = {_id: ObjectId(id)};
+            const options = {upsert: true};
+            const updateDoc = {
+                $set: {
+                    name: product.name,
+                    name: product.price,
+                    name: product.quantity,
+                    name: product.suppler,
+                    name: product.image,
+                    name: product.description,
+                }
+            };
+         
+            const result = await serviceCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+
+        });
+
+        //delete
+        app.delete('/service/:id', async(req,res)=>{
+            const id = req.params.id;
+
+            console.log(id)
+            const query = {_id: ObjectId(id)};
+            const result = await serviceCollection.deleteOne(query);
+            res.send(result);
         })
+      
 
     }
     finally {
