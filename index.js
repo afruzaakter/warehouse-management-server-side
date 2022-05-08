@@ -136,8 +136,11 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
+//check heroko
+app.get('/hero',(req,res)=>{
+    res.send('Heroku is running');
+    
+})
 app.get('/', (req, res) => {
     res.send('Running Server')
 });
