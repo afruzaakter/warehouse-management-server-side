@@ -76,24 +76,51 @@ async function run() {
             const updateDoc = {
                 $set: {
                     name: product.name,
-                    name: product.price,
-                    name: product.quantity,
-                    name: product.suppler,
-                    name: product.image,
-                    name: product.description,
+                    price: product.price,
+                    quantity: product.quantity,
+                    suppler: product.suppler,
+                    image: product.image,
+                    description: product.description,
                 }
-            };
-         
+            };     
             const result = await serviceCollection.updateOne(filter, updateDoc, options);
             res.send(result);
 
         });
+        //Quantity decrement
+      app.put('/service/:id', async(req, res) =>{
+          const id = req.params.id;
+          const items = req.body;
+          const filter = {_id: ObjectId(id)};
+          const options = {upsert: true};
+          const decrement = {
+              $set: {
+                  quantity:items.quantity-1,
+              }
+          };
+          const result = await serviceCollection.updateOne(filter, decrement, options);
+          res.send(result);
+      })
+    
+         //Stock add 
+         app.put('/service/:id', async(req, res) =>{
+            const id = req.params.id;
+            const items = req.body;
+            const filter = {_id: ObjectId(id)};
+            const options = {upsert: true};
+            const decrement = {
+                $set: {
+                    quantity:items.quantity,
+                }
+            };
+            const result = await serviceCollection.updateOne(filter, decrement, options);
+            res.send(result);
+        })
 
         //delete
         app.delete('/service/:id', async(req,res)=>{
             const id = req.params.id;
-
-            console.log(id)
+            // console.log(id)
             const query = {_id: ObjectId(id)};
             const result = await serviceCollection.deleteOne(query);
             res.send(result);
